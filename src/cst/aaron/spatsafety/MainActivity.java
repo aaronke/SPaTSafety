@@ -53,7 +53,12 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	public static final int MESSAGE_CONNECTED=1;
 	public static final int MESSAGE_DISCONNECTE=3;
 	private final static int DISCURABLE_TIME=300;
-	
+	private final static String KEEP_CURRENT_SPEED="keep current speed";
+	private final static String SPEED_UP="Speed up to";
+	private final static String SLOW_DOWN="Slow down to";
+	private final static String TURN_RED="Signal will turn red ahead";
+	private final static String RED_SIGNAL_AHEAD="Red light ahead";
+	private final static int SIGNAL_GREEN=3, SIGNAL_RED=1, SIGNAL_YELLOW=2;
 	public static TextView count_TextView;
 	public static ImageView signal_ImageView;
 	public static TextView connecttion_TextView;
@@ -61,6 +66,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	public static ImageView straight_ImageView;
 	public static ImageView right_ImageView;
 	public static TextToSpeech textToSpeech;
+	public static TextView acc_display;
 	private LocationManager locationManager;
 	private static double current_speed=-1, current_distance=-1;
 	private final static double RSU_LATI=53.522902, RSU_LONG=-113.517852;
@@ -74,7 +80,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	private final String FILE_PATH_STRING=Environment.getExternalStorageDirectory().getPath();
 	private CheckBox record_data_checkbox;
 	private static double acceleration=0;
-	private static String messageString="";
+	//private static String messageString="";
+	private static int color_label;
+	private static String voice_messageString;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +94,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
         connecttion_TextView=(TextView)findViewById(R.id.connect_label);
         speedometerView=(SpeedometerView)findViewById(R.id.speedometerview);
         record_data_checkbox=(CheckBox)findViewById(R.id.record_data_button);
+        acc_display=(TextView)findViewById(R.id.acceleration_display);
         speedometerView.setLabelConverter(new SpeedometerView.LabelConverter() {
 			
 			@Override
@@ -375,14 +384,17 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
     		
 			infoEntity.setDirection_code(InfoEntity.SIGNAL_DIRECTION_RL);
 			infoEntity.setSignal_color_code(InfoEntity.SINGAL_GREEN);
+			color_label=3;
 		}
     	if (msg.contains("RSB")) {
 			infoEntity.setDirection_code(InfoEntity.SIGNAL_DIRECTION_LEFT);
 			infoEntity.setSignal_color_code(InfoEntity.SIGNAL_RED);
+			color_label=1;
 		}
     	if (msg.contains("YSB")) {
 			infoEntity.setDirection_code(InfoEntity.SIGNAL_DIRECTION_STRAIGHT);
 			infoEntity.setSignal_color_code(InfoEntity.SIGNAL_YELLOW);
+			color_label=2;
 		}
     	if (current_speed!=-1) {
     		infoEntity.setSpeed(current_speed);
@@ -400,10 +412,76 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 		count_TextView.setVisibility(View.INVISIBLE);
 		connecttion_TextView.setText("not Connected");
 		speedometerView.clearColoredRanges();
+		speedometerView.setSpeed(0);
+		voice_messageString=null;
    }
    
-   
-   public static  String SafetyMsg(int color_label, int remaining_time, double dact, double Vveh, double aveh){
+private static String GLOSAUpdate(InfoEntity infoEntity){
+	   
+	   String advice_mesageString = null;
+	   double v_0=infoEntity.getSpeed();
+	   double x=infoEntity.getDistance();
+	  
+	  
+	   double v_max=infoEntity.getMax_speed();
+	   double t1=x/v_0;
+	   int t_m=infoEntity.getSignal_time();
+	   
+	   if (infoEntity.getSignal_color_code()==SIGNAL_GREEN) {
+		   
+		   double a_r=1.70*Math.exp(-0.04*v_0);
+		   double t2=(x-(Math.pow(v_max, 2)-Math.pow(v_0, 2))/(2*a_r))/v_max
+				   +(v_max-v_0)/a_r;
+		   if (t1<t_m) {
+			advice_mesageString=KEEP_CURRENT_SPEED;
+		   }else if (t2<=t_m && t1>t_m) {
+			double v_s;
+			v_s=v_0+a_r*t_m+Math.pow((a_r*(a_r*t_m*t_m+2*t_m*v_0-2*x)), 0.5);
+			if (v_s>v_max) {
+				advice_mesageString=TURN_RED;
+			}else {
+				advice_mesageString=SPEED_UP+(int)v_s;
+			}
+			
+		   }else if (t2>t_m) {
+			advice_mesageString=TURN_RED;
+		   }else {
+			// do nothing;
+		   }
+		   
+	   }else if (infoEntity.getSignal_color_code()==SIGNAL_YELLOW) {
+		   advice_mesageString=TURN_RED;
+		   
+	   }else if (infoEntity.getSignal_color_code()==SIGNAL_RED){
+		   double a_d=-0.005*Math.pow(v_0, 3)+0.154*v_0+0.493;
+		   double v_min=0.5*v_0;
+		   double t2=(x-(v_0*v_0-v_min*v_min)/(2*a_d))/v_min+(v_0-v_min)/a_d;
+		   if (t1>t_m) {
+			   advice_mesageString=KEEP_CURRENT_SPEED;
+		   }else if (t1<t_m && t2>t_m) {
+			   double v_s=v_0-a_d*t_m+Math.pow((a_d*(a_d*t_m*t_m-2*t_m*v_0+2*x)), 0.5);
+			   if (v_s<v_max && v_s >v_min) {
+				   advice_mesageString=SLOW_DOWN+(int)v_s;
+			   }else {
+				   advice_mesageString=RED_SIGNAL_AHEAD;
+			   }
+			   
+		   }else if (t2<=t_m) {
+			   advice_mesageString=RED_SIGNAL_AHEAD;
+		   }else {
+			   // do nothing;
+		   }
+			
+	   }else {
+		   // do nothing;
+	   }
+	   
+	   voice_messageString=advice_mesageString;
+	   return advice_mesageString;
+	   
+   }
+
+  /* public static  String SafetyMsg(int color_label, int remaining_time, double dact, double Vveh, double aveh){
 
 		// implement SafetyMsg..
 		// waiting for the specific values 
@@ -477,8 +555,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 			return  null;
 		}	
 }
-   
-   // get the advice message type;
+   */
+   /*// get the advice message type;
    private static String GLOSAUpdate(InfoEntity infoEntity){
 	   
 	   String advice_mesageString = null;
@@ -492,7 +570,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	   Log.v("STTest", "Message:"+messageString);
 	   return advice_mesageString;
 	   
-   }
+   }*/
    
     private static void UpdateUI(InfoEntity infoentity){
        count_TextView.setVisibility(View.VISIBLE);
@@ -636,7 +714,10 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 			record_entity.setAcc_y(event.values[1]);
 			record_entity.setAcc_z(event.values[2]);
 			record_entity.setTime(System.currentTimeMillis());
+			record_entity.setColor_label(color_label);
+			record_entity.setMessage(voice_messageString);
 			acceleration=event.values[1];
+			acc_display.setText("ACC_Y:"+record_entity.getAcc_y());
 			break;
 		default:
 			break;

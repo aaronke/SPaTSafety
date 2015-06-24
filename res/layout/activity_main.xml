@@ -47,4 +47,9 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:checked="false"/>
+      <TextView 
+          android:id="@+id/acceleration_display"
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:layout_below="@id/record_data_button"/>
 </RelativeLayout>

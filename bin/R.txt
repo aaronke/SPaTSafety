@@ -248,6 +248,7 @@ int drawable road_next 0x7f02005e
 int drawable spot_mask 0x7f02005f
 int drawable straight 0x7f020060
 int drawable yellow 0x7f020061
+int id acceleration_display 0x7f090041
 int id action_bar 0x7f09001c
 int id action_bar_activity_content 0x7f090001
 int id action_bar_container 0x7f09001b
@@ -259,7 +260,7 @@ int id action_context_bar 0x7f09001d
 int id action_menu_divider 0x7f090002
 int id action_menu_presenter 0x7f090003
 int id action_mode_close_button 0x7f090024
-int id action_settings 0x7f090041
+int id action_settings 0x7f090042
 int id activity_chooser_view_content 0x7f090025
 int id always 0x7f09000f
 int id beginning 0x7f090016
