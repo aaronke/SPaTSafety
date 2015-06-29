@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
@@ -68,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	public static TextToSpeech textToSpeech;
 	public static TextView acc_display;
 	private LocationManager locationManager;
-	private static double current_speed=-1, current_distance=-1;
+	private static double current_speed=0, current_distance=150;
 	private final static double RSU_LATI=53.522902, RSU_LONG=-113.517852;
 	private static SpeedometerView speedometerView;
 	private static boolean voice_message_flag=true,connected_flag=false;
@@ -171,7 +172,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
   		}
   		return path;
   	}
-    public static void speakToText(String string){
+    @SuppressWarnings("deprecation")
+	public static void speakToText(String string){
     	
     	textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
     }
@@ -301,7 +303,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 						
 					}else {
 						flag++;
-						if (flag>50000) {
+						if (flag>100000) {
 							Log.v("STTest", "inside result:"+result);
 							mHandler.obtainMessage(MESSAGE_DISCONNECTE).sendToTarget();
 						}
@@ -416,7 +418,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 		voice_messageString=null;
    }
    
-private static String GLOSAUpdate(InfoEntity infoEntity){
+/*private static String GLOSAUpdate(InfoEntity infoEntity){
 	   
 	   String advice_mesageString = null;
 	   double v_0=infoEntity.getSpeed();
@@ -479,9 +481,9 @@ private static String GLOSAUpdate(InfoEntity infoEntity){
 	   voice_messageString=advice_mesageString;
 	   return advice_mesageString;
 	   
-   }
+   }*/
 
-  /* public static  String SafetyMsg(int color_label, int remaining_time, double dact, double Vveh, double aveh){
+  public static  String SafetyMsg(int color_label, int remaining_time, double dact, double Vveh, double aveh){
 
 		// implement SafetyMsg..
 		// waiting for the specific values 
@@ -555,8 +557,8 @@ private static String GLOSAUpdate(InfoEntity infoEntity){
 			return  null;
 		}	
 }
-   */
-   /*// get the advice message type;
+   
+   // get the advice message type;
    private static String GLOSAUpdate(InfoEntity infoEntity){
 	   
 	   String advice_mesageString = null;
@@ -566,11 +568,11 @@ private static String GLOSAUpdate(InfoEntity infoEntity){
 	   int t_m=infoEntity.getSignal_time();
 	   
 	   advice_mesageString=SafetyMsg(infoEntity.getSignal_color_code(),t_m, x,v_0,d);
-	   messageString=advice_mesageString;
-	   Log.v("STTest", "Message:"+messageString);
+	   voice_messageString=advice_mesageString;
+	   Log.v("STTest", "Message:"+voice_messageString);
 	   return advice_mesageString;
 	   
-   }*/
+   }
    
     private static void UpdateUI(InfoEntity infoentity){
        count_TextView.setVisibility(View.VISIBLE);
