@@ -69,14 +69,14 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	public static TextToSpeech textToSpeech;
 	public static TextView acc_display;
 	private LocationManager locationManager;
-	private static double current_speed=0, current_distance=150;
+	private static double current_speed=0, current_distance=200;
 	private final static double RSU_LATI=53.522902, RSU_LONG=-113.517852;
 	private static SpeedometerView speedometerView;
 	private static boolean voice_message_flag=true,connected_flag=false;
 	//private static ArrayList<Double> distance_arrayList=new ArrayList<Double>();
 	private SensorManager sensorManager;
 	private Sensor accelerationSensor;
-	private Record_entity record_entity=new Record_entity();
+	private static Record_entity record_entity=new Record_entity();
 	private String device_id,file_name;
 	private final String FILE_PATH_STRING=Environment.getExternalStorageDirectory().getPath();
 	private CheckBox record_data_checkbox;
@@ -381,7 +381,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
     		int count=Integer.parseInt(msg.substring(3, 5));
     		Log.v("bluetooth", msg.substring(3, 5));
     	infoEntity.setSignal_time(count);
-    	
+    	record_entity.setSignal_time(count);
     	if (msg.contains("GSB")) {
     		
 			infoEntity.setDirection_code(InfoEntity.SIGNAL_DIRECTION_RL);
@@ -418,7 +418,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 		voice_messageString=null;
    }
    
-/*private static String GLOSAUpdate(InfoEntity infoEntity){
+ private static String GLOSAUpdate(InfoEntity infoEntity){
 	   
 	   String advice_mesageString = null;
 	   double v_0=infoEntity.getSpeed();
@@ -481,9 +481,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	   voice_messageString=advice_mesageString;
 	   return advice_mesageString;
 	   
-   }*/
+   }
 
-  public static  String SafetyMsg(int color_label, int remaining_time, double dact, double Vveh, double aveh){
+ /* public static  String SafetyMsg(int color_label, int remaining_time, double dact, double Vveh, double aveh){
 
 		// implement SafetyMsg..
 		// waiting for the specific values 
@@ -557,9 +557,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 			return  null;
 		}	
 }
-   
+   */
    // get the advice message type;
-   private static String GLOSAUpdate(InfoEntity infoEntity){
+   /*private static String GLOSAUpdate(InfoEntity infoEntity){
 	   
 	   String advice_mesageString = null;
 	   double v_0=infoEntity.getSpeed();
@@ -572,7 +572,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener,
 	   Log.v("STTest", "Message:"+voice_messageString);
 	   return advice_mesageString;
 	   
-   }
+   }*/
    
     private static void UpdateUI(InfoEntity infoentity){
        count_TextView.setVisibility(View.VISIBLE);
@@ -746,10 +746,10 @@ private void writeToFile(Record_entity entity){
 			OutputStream myOutputStream=new FileOutputStream(sensorsdatafile,true);
 			OutputStreamWriter myOutputStreamWriter=new OutputStreamWriter(myOutputStream);
 			if (!sensorsdata) {
-				myOutputStreamWriter.append("Time,Speed,Distance,Acc_x,Acc_y,Acc_z,Longitude,Latitude,message,color_label\n");
+				myOutputStreamWriter.append("Time,Signal_time,Speed,Distance,Acc_x,Acc_y,Acc_z,Longitude,Latitude,message,color_label\n");
 			}
 		
-			String sensor_tmp=entity.getTime()+","+entity.getSpeed()+","+entity.getDistance()+","+entity.getAcc_x()+","+entity.getAcc_y()+","+entity.getAcc_z()+","
+			String sensor_tmp=entity.getTime()+","+entity.getSignal_time()+","+entity.getSpeed()+","+entity.getDistance()+","+entity.getAcc_x()+","+entity.getAcc_y()+","+entity.getAcc_z()+","
 			+entity.getLongitude()+","+entity.getLatitude()+","+entity.getMessage()+","+entity.getColor_label()+"\n";
 			
 			myOutputStreamWriter.append(sensor_tmp);

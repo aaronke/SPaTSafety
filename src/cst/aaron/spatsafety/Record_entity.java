@@ -9,7 +9,16 @@ public class Record_entity {
 	private double distance;
 	private String message;
 	private int color_label;
+	private int signal_time;
 	
+	public int getSignal_time() {
+		return signal_time;
+	}
+
+	public void setSignal_time(int signal_time) {
+		this.signal_time = signal_time;
+	}
+
 	public Record_entity(){
 		
 	}
