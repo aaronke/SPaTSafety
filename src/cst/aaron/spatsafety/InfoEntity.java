@@ -8,7 +8,7 @@ public class InfoEntity {
 	
 	private double speed=25;
 	private double distance=200;
-	private double max_speed=80/3.6;
+	private double max_speed=50/3.6;
 	
 	public static final int SIGNAL_NONE=0,SIGNAL_RED=1,SIGNAL_YELLOW=2,SINGAL_GREEN=3;
 	public static final int SIGNAL_DIRECTION_RL=1,SIGNAL_DIRECTION_LEFT=2,SIGNAL_DIRECTION_STRAIGHT=3;
